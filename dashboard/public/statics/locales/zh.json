@@ -335,7 +335,8 @@
         "advanced": "高级规则选项",
         "advancedTitle": "规则选项",
         "advancedDescription": "在此规则匹配时配置可选响应头。",
-        "advancedHeadersHint": "{{count}} 个自定义响应头 — 点击编辑"
+        "advancedHeadersHint": "{{count}} 个自定义响应头 — 点击编辑",
+        "removeRule": "移除规则"
       },
       "formats": {
         "title": "手动订阅格式",
@@ -415,10 +416,12 @@
           "linux": "Linux",
           "appletv": "Apple TV",
           "androidtv": "Android TV"
-        }
+        },
+        "descriptionDescription": "应用的多语言描述"
       },
       "resetToDefault": "重置为默认",
-      "resetToDefaultSuccess": "订阅规则已重置为默认"
+      "resetToDefaultSuccess": "订阅规则已重置为默认",
+      "saveFailed": "保存订阅设置失败"
     },
     "hwid": {
       "title": "硬件 ID",
@@ -1498,31 +1501,31 @@
       "mode": "模式",
       "noGrpcHeader": "没有 gRPC 头",
       "xPaddingBytes": "X-Padding 字节数",
-      "xPaddingObfsMode": "X-Padding Obfs Mode",
-      "xPaddingKey": "X-Padding Key",
-      "xPaddingHeader": "X-Padding Header",
-      "xPaddingPlacement": "X-Padding Placement",
-      "xPaddingMethod": "X-Padding Method",
-      "uplinkHttpMethod": "Uplink HTTP Method",
-      "sessionPlacement": "Session Placement",
-      "sessionKey": "Session Key",
+      "xPaddingObfsMode": "X-Padding 混淆模式",
+      "xPaddingKey": "X-Padding 密钥",
+      "xPaddingHeader": "X-Padding 请求头",
+      "xPaddingPlacement": "X-Padding 位置",
+      "xPaddingMethod": "X-Padding 方法",
+      "uplinkHttpMethod": "上行 HTTP 方法",
+      "sessionPlacement": "会话位置",
+      "sessionKey": "会话密钥",
       "sessionIdTable": "Session ID 字符表",
       "sessionIdTablePlaceholder": "例如 Base62、HEX 或自定义字符",
       "sessionIdLength": "Session ID 长度",
       "sessionIdLengthPlaceholder": "例如 8 或 8-16",
       "customValue": "自定义",
       "sessionIdTableCustomPlaceholder": "输入自定义字符 (ASCII)",
-      "seqPlacement": "Seq Placement",
-      "seqKey": "Seq Key",
-      "uplinkDataPlacement": "Uplink Data Placement",
-      "uplinkDataKey": "Uplink Data Key",
-      "uplinkChunkSize": "Uplink Chunk Size",
+      "seqPlacement": "Seq 位置",
+      "seqKey": "Seq 密钥",
+      "uplinkDataPlacement": "上行数据位置",
+      "uplinkDataKey": "上行数据密钥",
+      "uplinkChunkSize": "上行分块大小",
       "scMaxEachPostBytes": "每个帖子最大字节数",
       "scMinPostsIntervalMs": "最小帖子间隔 (毫秒)",
-      "xPaddingAdvanced": "X-Padding Advanced",
+      "xPaddingAdvanced": "X-Padding 高级选项",
       "xPaddingAdvancedHint": "仅在启用 X-Padding Obfs Mode 时显示。",
-      "uplinkSettings": "Uplink Settings",
-      "sessionSettings": "Session/Seq Settings",
+      "uplinkSettings": "上行设置",
+      "sessionSettings": "会话 / Seq 设置",
       "xmux": "XMux 设置",
       "maxConcurrency": "最大并发数",
       "maxConnections": "最大连接数",
@@ -1703,7 +1706,7 @@
       "brutalUp": "Brutal 上行",
       "brutalDown": "Brutal 下行",
       "mbpsPlaceholder": "例如 60 mbps",
-      "udpHop": "UDP Hop",
+      "udpHop": "UDP 跳跃",
       "udpHopLegacyHint": "Xray 26.9.9+ 客户端会忽略此项并使用 udphop UDP 掩码；Hysteria2 链接、sing-box 和 Clash 仍会读取它。",
       "ports": "端口",
       "portsPlaceholder": "例如 20000-50000 或 11,13,15-17",
@@ -1926,7 +1929,10 @@
       "reserved": "Reserved（例如 0,0,0）",
       "dns": "DNS 服务器",
       "dnsHint": "留空使用系统 DNS"
-    }
+    },
+    "allowInsecure": "允许不安全连接",
+    "muxEnable": "启用多路复用（Mux）",
+    "randomUserAgent": "随机 User Agent"
   },
   "inbound": "入站",
   "inbounds": "入站",
@@ -2242,7 +2248,9 @@
     "priorityUpdateError": "更新主机失败",
     "noHosts": "未配置主机",
     "noHostsDescription": "开始创建您的第一个主机配置。",
-    "noSearchResults": "没有主机匹配您的搜索条件。请尝试调整搜索词。"
+    "noSearchResults": "没有主机匹配您的搜索条件。请尝试调整搜索词。",
+    "noFilteredResults": "未找到节点",
+    "skip": "跳过"
   },
   "pasarguard": "PasarGuard",
   "group": {
@@ -2296,12 +2304,7 @@
     "seconds": "秒",
     "certificate": "证书",
     "certificatePlaceholder": "输入证书",
-    "status": {
-      "connected": "已连接",
-      "error": "错误",
-      "connecting": "连接中...",
-      "disabled": "已禁用"
-    },
+    "status": "节点状态",
     "statusCheck": "检查状态",
     "statusChecking": "检查中...",
     "reconnect": "重新连接",
@@ -2420,7 +2423,9 @@
     "updating": "更新中...",
     "updateAvailable": "有更新可用",
     "prerelease": "预发布版本",
-    "loadingReleases": "正在加载版本..."
+    "loadingReleases": "正在加载版本...",
+    "statusCheckSuccess": "节点连接成功",
+    "statusCheckFailed": "节点连接失败"
   },
   "theme": {
     "title": "主题",
@@ -2542,10 +2547,10 @@
     "createNewConfig": "创建新的核心配置",
     "editCore": "编辑核心配置",
     "invalidJson": "无效的 JSON 配置",
-    "createSuccess": "核心配置 \"{name}\" 已成功创建",
-    "createFailed": "核心配置 \"{name}\" 创建失败",
-    "editSuccess": "核心配置 \"{name}\" 已成功更新",
-    "editFailed": "核心配置 \"{name}\" 更新失败",
+    "createSuccess": "核心配置 «{{name}}» 已成功创建",
+    "createFailed": "核心配置 «{{name}}» 创建失败",
+    "editSuccess": "核心配置 «{{name}}» 已成功更新",
+    "editFailed": "核心配置 «{{name}}» 更新失败",
     "keyPairGenerated": "密钥对生成成功",
     "shortIdGenerated": "短 ID 已成功生成",
     "shortId": "短 ID",
@@ -2831,12 +2836,12 @@
       "uplinkdataplacement": "上行数据放置",
       "uplinkhttpmethod": "上行 HTTP 方法",
       "useragent": "User-Agent",
-      "xpaddingbytes": "X-Padding Bytes",
-      "xpaddingheader": "X-Padding Header",
-      "xpaddingkey": "X-Padding Key",
-      "xpaddingmethod": "X-Padding Method",
-      "xpaddingobfsmode": "X-Padding Obfs Mode",
-      "xpaddingplacement": "X-Padding Placement",
+      "xpaddingbytes": "X-Padding 字节数",
+      "xpaddingheader": "X-Padding 请求头",
+      "xpaddingkey": "X-Padding 密钥",
+      "xpaddingmethod": "X-Padding 方法",
+      "xpaddingobfsmode": "X-Padding 混淆模式",
+      "xpaddingplacement": "X-Padding 位置",
       "xmux": "XMUX",
       "ruletag": "规则标签",
       "outboundtag": "出站标签",
@@ -2883,7 +2888,7 @@
       "interface": "绑定网卡",
       "tcpCongestion": "TCP 拥塞控制",
       "tcpCongestionHint": "仅 Linux（如 bbr、cubic）。留空使用系统默认。",
-      "tcpMaxSeg": "TCP MSS (tcpMaxSeg)",
+      "tcpMaxSeg": "TCP MSS（tcpMaxSeg）",
       "tcpUserTimeout": "TCP 用户超时 (毫秒)",
       "tcpKeepAliveIdle": "TCP keep-alive 空闲 (秒)",
       "tcpKeepAliveInterval": "TCP keep-alive 间隔 (秒)",
@@ -3245,7 +3250,20 @@
       "discardEditTitle": "放弃更改？",
       "discardEditDescription": "如果现在关闭，对此入站的修改将会丢失。",
       "finishCurrentTitle": "请先完成当前入站",
-      "finishCurrentDescription": "请先加入列表，或关闭对话框并丢弃草稿，再开始另一个入站。"
+      "finishCurrentDescription": "请先加入列表，或关闭对话框并丢弃草稿，再开始另一个入站。",
+      "keepAtLeastOne": "至少需要一个入站。",
+      "fallbacks": {
+        "title": "回落（Fallbacks）",
+        "hint": "用于 VLESS 或 Trojan 的 TCP 入站。Xray 会把匹配的流量转发到目标（端口、host:port 或 UDS 路径）。SNI 和 ALPN 仅在启用 TLS 时生效。未填写目标的行会被忽略。",
+        "rowLabel": "规则 {{index}}",
+        "remove": "移除规则",
+        "name": "SNI（名称）",
+        "alpn": "ALPN",
+        "path": "路径",
+        "dest": "目标（dest）",
+        "xver0": "关闭（0）",
+        "addRow": "添加回落规则"
+      }
     },
     "outbound": {
       "add": "添加出站",
@@ -3431,7 +3449,8 @@
         "wireguardSecretRequired": "WireGuard 私钥为必填项。",
         "inboundTagRequired": "Loopback 需要入站标签。",
         "requiredFieldsTitle": "缺少必填字段"
-      }
+      },
+      "formatJson": "格式化"
     },
     "routing": {
       "outbound": "出站",
@@ -3547,7 +3566,7 @@
       "serverSearchPlaceholder": "按地址、标签、域名、策略搜索…",
       "serverBulkDeleteTitle": "删除所选 DNS 服务器",
       "emptyServers": "无 DNS 服务器",
-      "hostsTitle": "Hosts",
+      "hostsTitle": "静态解析（Hosts）",
       "addHost": "添加 Host",
       "emptyHosts": "无 host 映射",
       "dialogAddServer": "添加 DNS 服务器",
@@ -3641,7 +3660,7 @@
       "feasible": "适合的 Reality 目标",
       "notFeasible": "不适合的 Reality 目标",
       "tls13": "TLS 1.3",
-      "h2": "HTTP/2 (ALPN)",
+      "h2": "HTTP/2（ALPN）",
       "keyExchange": "X25519 密钥交换",
       "postQuantum": "后量子 (X25519MLKEM768)",
       "h3": "HTTP/3 (已通告)",
@@ -3656,7 +3675,8 @@
       "other": "其他",
       "sniLabel": "SNI",
       "sniDiscovered": "从 IP 发现"
-    }
+    },
+    "minRowsBlocked": "删除的条目过多。"
   },
   "settings.cores.title": "核心",
   "settings.cores.description": "管理您的核心",
@@ -3706,7 +3726,16 @@
     "editError": "更新用户 «{{name}}» 失败",
     "createError": "创建用户 «{{name}}» 失败",
     "selectStatus": "选择状态",
-    "selectedTemplates": "已选择 {{count}} 个模板"
+    "selectedTemplates": "已选择 {{count}} 个模板",
+    "username": "用户名",
+    "status": "状态",
+    "dataLimitResetStrategy": "流量重置策略",
+    "expire": "到期日期",
+    "onHoldTimeout": "暂扣到期时间",
+    "autoDeleteInDays": "自动删除（天）",
+    "proxySettings": "代理设置",
+    "nextPlan": "下期套餐",
+    "groups": "分组"
   },
   "userSettings": {
     "subscriptionUrlCopied": "订阅链接已复制到剪贴板"
@@ -4223,5 +4252,21 @@
     "updateCommandLabel": "通过 SSH 连接并运行:",
     "closeBanner": "关闭更新通知",
     "needsUpdate": "需要更新"
+  },
+  "none": "无",
+  "dateInfo": {
+    "day": "天",
+    "hour": "小时",
+    "min": "分钟",
+    "month": "月",
+    "year": "年"
+  },
+  "fields": {
+    "username": "用户名",
+    "data_limit": "流量限制",
+    "expire": "到期日期",
+    "note": "备注",
+    "on_hold_expire_duration": "暂扣到期时长",
+    "group_ids": "分组"
   }
 }
