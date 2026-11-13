@@ -80,13 +80,96 @@ class SingBoxConfiguration(BaseSubscription):
         urltest_tags.extend(endpoint_tags)
         selector_tags.extend(endpoint_tags)
 
+        # [topren patch] 模板已写 outbounds 的组保留原样（对齐 Marzban patches/singbox.py）
         for outbound in self.config["outbounds"]:
-            if outbound.get("type") == "urltest":
+            if outbound.get("type") == "urltest" and outbound.get("outbounds") is None:
                 outbound["outbounds"] = urltest_tags
 
         for outbound in self.config["outbounds"]:
-            if outbound.get("type") == "selector":
+            if outbound.get("type") == "selector" and outbound.get("outbounds") is None:
                 outbound["outbounds"] = selector_tags
+
+        existing = [o["tag"] for o in self.config["outbounds"] if "tag" in o]
+        existing += [e["tag"] for e in self.config.get("endpoints", []) if e.get("tag")]
+        existing_set = set(existing)
+
+        def _resolve(ref):
+            if not isinstance(ref, str) or ref in existing_set or "{" not in ref:
+                return ref
+            pattern = re.compile("^" + re.sub(r"\\\{[A-Za-z0-9_]+\\\}", ".+?", re.escape(ref)) + "$")
+            for tag in existing:
+                if pattern.match(tag):
+                    return tag
+            return ref
+
+        # [topren patch 2026-10-14] 成员被裁剪到 0 的分组, 整组删除并从所有引用处移除,
+        # 而不是退化成 ["direct"]。原因: 像「加州家宽-自动测速」这种纯家宽分组, 对看不到家宽
+        # 节点的分享用户会被裁成空组, 若填 direct 则该用户选中它就是明文直连、泄露真实 IP。
+        # 迭代是因为删掉一个空组可能让引用它的上层组也变空。
+        def _groups():
+            return [o for o in self.config["outbounds"]
+                    if o.get("type") in ("urltest", "selector") and isinstance(o.get("outbounds"), list)]
+
+        for _ in range(10):
+            existing = [o["tag"] for o in self.config["outbounds"] if "tag" in o]
+            existing += [e["tag"] for e in self.config.get("endpoints", []) if e.get("tag")]
+            existing_set = set(existing)
+            empty = set()
+            for ob in _groups():
+                resolved = []
+                for ref in ob["outbounds"]:
+                    tag = _resolve(ref)
+                    if tag in existing_set and tag not in resolved:
+                        resolved.append(tag)
+                ob["outbounds"] = resolved
+                if not resolved and ob.get("tag"):
+                    empty.add(ob["tag"])
+            if not empty:
+                break
+            self.config["outbounds"] = [o for o in self.config["outbounds"]
+                                        if o.get("tag") not in empty]
+            # 同步清理 route 规则里指向被删组的引用, 否则 sing-box 会因未知 outbound 启动失败。
+            # 删整条规则(而非改指向)才是正确语义: 规则的目标没了, 这些流量应落到 route.final,
+            # 仍然走代理; 若改指向 direct 就成了明文直连。
+            route = self.config.get("route")
+            if isinstance(route, dict) and isinstance(route.get("rules"), list):
+                route["rules"] = [r for r in route["rules"]
+                                  if not (isinstance(r, dict) and r.get("outbound") in empty)]
+
+        # 收尾: 迭代上限兜底(理论上到不了) + 修正 default 指向
+        for ob in _groups():
+            if not ob["outbounds"]:
+                ob["outbounds"] = ["direct"]
+            if isinstance(ob.get("default"), str):
+                d = _resolve(ob["default"])
+                ob["default"] = d if d in ob["outbounds"] else ob["outbounds"][0]
+
+        # [topren patch 2026-10-30] 订阅 dns.strategy=ipv4_only, 节点 server 若是只有 AAAA 的域名(ppf6/hk6.topren.top)
+        # 会 "lookup ...: empty result" 连不上。给所有「server 是域名」的代理出站单独指定解析策略 prefer_ipv4:
+        # 有 A 记录照旧走 v4(现有节点行为不变), 只有 AAAA 时才用 v6。站点流量的解析仍受全局 ipv4_only 约束。
+        import ipaddress as _ip
+        _route = self.config.get("route") if isinstance(self.config.get("route"), dict) else {}
+        _ddr = _route.get("default_domain_resolver")
+        _rsv = _ddr.get("server") if isinstance(_ddr, dict) else (_ddr or "dns-direct")
+        for ob in self.config["outbounds"]:
+            srv = ob.get("server")
+            if not isinstance(srv, str) or not srv or "domain_resolver" in ob:
+                continue
+            try:
+                _ip.ip_address(srv)
+                continue
+            except ValueError:
+                ob["domain_resolver"] = {"server": _rsv, "strategy": "prefer_ipv4"}
+
+        # route.final 若指向被删掉的组, 回退到第一个仍存在的 selector(而不是 direct)
+        route = self.config.get("route")
+        if isinstance(route, dict) and isinstance(route.get("final"), str):
+            tags = set(o.get("tag") for o in self.config["outbounds"] if o.get("tag"))
+            if route["final"] not in tags:
+                sel = next((o["tag"] for o in self.config["outbounds"]
+                            if o.get("type") == "selector" and o.get("tag")), None)
+                if sel:
+                    route["final"] = sel
 
     def add(self, remark: str, address: str, inbound: SubscriptionInboundData, settings: dict):
         """Add outbound using registry pattern"""
@@ -354,6 +437,8 @@ class SingBoxConfiguration(BaseSubscription):
         hop_ports = udp_hop.get("ports")
         if hop_ports:
             config["server_ports"] = [hop_ports] if isinstance(hop_ports, str) else hop_ports
+            # 2026-10-30: sing-box 端口段写法是 "20000:29999", 写成 "-" 会让整份配置 FATAL(bad port range)。
+            config["server_ports"] = [str(x).replace("-", ":") for x in config["server_ports"]]
         hop_iv = udp_hop.get("hopInterval") or udp_hop.get("interval")
         if hop_iv:
             hop_iv = str(hop_iv).rstrip("s")
@@ -374,6 +459,8 @@ class SingBoxConfiguration(BaseSubscription):
         # Add TLS
         if inbound.tls_config.tls in ("tls", "reality"):
             config["tls"] = self._apply_tls(inbound.tls_config, inbound.fragment_settings)
+            # 2026-10-30: sing-box 的 QUIC 不支持 uTLS(运行时报 unsupported usage for uTLS, 节点不可用), hysteria2 去掉 utls。
+            config["tls"].pop("utls", None)
 
         return self._normalize_and_remove_none_values(config)
 
